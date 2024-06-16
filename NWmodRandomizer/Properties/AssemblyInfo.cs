@@ -2,19 +2,19 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using MelonLoader;
-using NWmodRandomizer; // The namespace of your mod class
+using NeonRandom; // The namespace of your mod class
 // ...
-[assembly: MelonInfo(typeof(NeonRandom), "NeonRandom", "1.0.0", "rakeaDev")]
-[assembly: MelonGame("Anapurna Interactive", "Neon White")]
+[assembly: MelonInfo(typeof(NeonRandom.NeonRandom), "NeonRandom", "1.0.0", "rakeaDev")]
+[assembly: MelonGame("Little Flag Software, LLC", "Neon White")]
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NWmodRandomizer")]
+[assembly: AssemblyTitle("NeonRandom")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NWmodRandomizer")]
+[assembly: AssemblyProduct("NeonRandom")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
