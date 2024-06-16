@@ -23,7 +23,7 @@ namespace NeonRandom
         public static MelonPreferences_Entry<bool> Setting_NeonRandom_Enabled;
         public static MelonPreferences_Entry<bool> Setting_NeonRandom_WarningEnabled;
         public static MelonPreferences_Entry<KeyCode> Setting_NeonRandom_NewLevel;
-
+        public static MelonPreferences_Entry<bool> Setting_NeonRandom_TimerEnabled;
         #endregion
 
         // All the Levels as IDs
@@ -39,9 +39,10 @@ namespace NeonRandom
         {
             //Settings
             Config_NeonRandom = MelonPreferences.CreateCategory("NeonRandom Settings");
-            Setting_NeonRandom_Enabled = Config_NeonRandom.CreateEntry("NeonRandom Enabled", true, description: "Enables and disables NeonRandom (Quit out of levle to start the timer)");
+            Setting_NeonRandom_Enabled = Config_NeonRandom.CreateEntry("NeonRandom Enabled", true, description: "Enables and disables NeonRandom (Quit out of level to start the timer)");
             Setting_NeonRandom_NewLevel = Config_NeonRandom.CreateEntry("New level manual keybind", KeyCode.Z , description: "Press this key, to randomly select and load a new level while in the level loading screen");
             Setting_NeonRandom_Time = Config_NeonRandom.CreateEntry("Time to load new level", 300, description: "Time in seconds, after which the mod will load a new random level");
+            Setting_NeonRandom_TimerEnabled = Config_NeonRandom.CreateEntry("Enable Timer", true, description: "Enables the times, loading you into a new level after the timer finished");
             Setting_NeonRandom_WarningEnabled = Config_NeonRandom.CreateEntry("Warning Enabled", true, description: "During your last try a warning will be shown that after this try the level will change to a new one. Press the manual random level key while during the last try, to prevent it from loading a new level and instead restart the timer.");
         }
 
@@ -58,15 +59,6 @@ namespace NeonRandom
             
             Canvas canvas = ModObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-            /*
-             * [17:53:30.202] [NeonRandom] System.NullReferenceException
-  at (wrapper managed-to-native) UnityEngine.Object.DontDestroyOnLoad(UnityEngine.Object)
-  at NeonRandom.NeonRandom.OnApplicationLateStart () [0x0004b] in <1a86fa5382bb4f3da0eb44f003fa9454>:0
-  at MelonLoader.MelonEvent+<>c.<Invoke>b__1_0 (MelonLoader.LemonAction x) [0x00000] in <112bf5057ecd4569be296005e32014ff>:0
-  at MelonLoader.MelonEventBase`1[T].Invoke (System.Action`1[T] delegateInvoker) [0x00018] in <112bf5057ecd4569be296005e32014ff>:0
-             */
-
         }
 
         public override void OnUpdate()
@@ -80,7 +72,7 @@ namespace NeonRandom
         private void OnLevelLoadComplete()
         {
             //Start timer when a level first loads
-            if (Setting_NeonRandom_Enabled.Value)
+            if (Setting_NeonRandom_Enabled.Value && Setting_NeonRandom_TimerEnabled.Value)
             {
                 StartTimer();
             }
