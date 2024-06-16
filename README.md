@@ -4,7 +4,7 @@ Neon Random is a mod for Neon White, that randomly loads a new level after a set
 
 ### Features
 -> Loading Random Level after selected time (only during resetting, do not worry about losing your run)
--> Randomly load new level, if your not happy with the current selection
+-> Randomly load new level on button press, if your not happy with the current selection
 -> Last Try warning (Press the load new level key during this run to restart the timer)
 
 ### Warnings
@@ -15,4 +15,4 @@ This mod uses MelonLoader, check the NeonLite readme for installing that, NeonLi
 https://github.com/MOPSKATER/NeonLite/releases
 
 ## Contributing
-If you have any question etc. feel free to dm me on Discord (rrakea). If your interested in Neon White modding, check out the speedrunning Discord, you can find on the speedrun.com page.
+If you have any question etc. feel free to dm me on Discord (rrakea). If your interested in Neon White modding, check out the speedrunning Discord, you can find it on the speedrun.com page.
