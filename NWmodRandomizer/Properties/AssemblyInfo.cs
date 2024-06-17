@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using MelonLoader;
 using NeonRandom; // The namespace of your mod class
 // ...
-[assembly: MelonInfo(typeof(NeonRandom.NeonRandom), "NeonRandom", "1.0.0", "rakeaDev")]
+[assembly: MelonInfo(typeof(NeonRandom.NeonRandom), "NeonRandom", "1.0.1", "rakeaDev")]
 [assembly: MelonGame("Little Flag Software, LLC", "Neon White")]
 
 // General Information about an assembly is controlled through the following

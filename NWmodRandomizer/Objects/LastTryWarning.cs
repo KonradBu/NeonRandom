@@ -29,7 +29,7 @@ namespace NeonRandom
         
         private void OnGUI()
         {
-            if (NeonRandom.Setting_NeonRandom_WarningEnabled.Value && NeonRandom.lasttry)
+            if (NeonRandom.Setting_NeonRandom_WarningEnabled.Value && NeonRandom.lasttry && NeonRandom.Setting_NeonRandom_Enabled.Value)
             {
                 String text = "Last Try!";
                 GUI.Label(_rectTotal, text, _style);

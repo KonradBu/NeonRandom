@@ -33,6 +33,8 @@ namespace NeonRandom
 
         public static bool timerfinished = false;
         public static bool lasttry = false;
+        private static bool devmode = false;
+        public static bool timerrunning = false;
 
         [Obsolete]
         public override void OnApplicationStart()
@@ -43,7 +45,7 @@ namespace NeonRandom
             Setting_NeonRandom_NewLevel = Config_NeonRandom.CreateEntry("New level manual keybind", KeyCode.Z , description: "Press this key, to randomly select and load a new level while in the level loading screen");
             Setting_NeonRandom_Time = Config_NeonRandom.CreateEntry("Time to load new level", 300, description: "Time in seconds, after which the mod will load a new random level");
             Setting_NeonRandom_TimerEnabled = Config_NeonRandom.CreateEntry("Enable Timer", true, description: "Enables the times, loading you into a new level after the timer finished");
-            Setting_NeonRandom_WarningEnabled = Config_NeonRandom.CreateEntry("Warning Enabled", true, description: "During your last try a warning will be shown that after this try the level will change to a new one. Press the manual random level key while during the last try, to prevent it from loading a new level and instead restart the timer.");
+            Setting_NeonRandom_WarningEnabled = Config_NeonRandom.CreateEntry("Warning Enabled", true, description: "During your last try a warning will be shown that after this try the level will change to a new one. Press the manual random level key during the last try to prevent it from loading a new level and instead restart the timer.");
         }
 
         
@@ -64,17 +66,42 @@ namespace NeonRandom
         public override void OnUpdate()
         {
             //Manually loading a new level
-            if (InputManager.GetKeyDown(Setting_NeonRandom_NewLevel.Value)){
-                NewLevel();
+            if (InputManager.GetKeyDown(Setting_NeonRandom_NewLevel.Value) && Setting_NeonRandom_Enabled.Value) {
+                if (lasttry == true)
+                {
+                    lasttry = false;
+                    timerfinished = false;
+                    timerrunning = false;
+                    StartTimer();
+                    if (devmode)
+                    {
+                        MelonLogger.Msg("Timer Reset");
+                    }
+                }
+                else
+                {
+                    NewLevel();
+                    if (devmode)
+                    {
+                        MelonLogger.Msg("New Level Load requested");
+                    }
+                }
             }
         }
   
         private void OnLevelLoadComplete()
         {
+            string currentLevel = "";
             //Start timer when a level first loads
-            if (Setting_NeonRandom_Enabled.Value && Setting_NeonRandom_TimerEnabled.Value)
+            if (Setting_NeonRandom_Enabled.Value && Setting_NeonRandom_TimerEnabled.Value && !timerrunning)
             {
                 StartTimer();
+                lasttry = false;
+                timerfinished = false;
+                if (devmode)
+                {
+                    MelonLogger.Msg("Timer Started");
+                }
             }
             new GameObject("LastTryWarning").AddComponent<LastTryWarning>();
         }
@@ -85,11 +112,21 @@ namespace NeonRandom
             newTimer = new System.Timers.Timer(Setting_NeonRandom_Time.Value * 1000);
             newTimer.Elapsed += OnTimedEvent;
             newTimer.Enabled = true;
+            newTimer.AutoReset = false;
+            timerrunning = true;
         }
 
         private static void OnTimedEvent(System.Object source, ElapsedEventArgs e)
         {
-            timerfinished = true;
+            if (Setting_NeonRandom_TimerEnabled.Value && Setting_NeonRandom_Enabled.Value)
+            {
+                timerfinished = true;
+                if (devmode)
+                {
+                    MelonLogger.Msg("Timer finished");
+                }
+            }
+            
         }
 
         private static void NewLevel()
@@ -98,27 +135,57 @@ namespace NeonRandom
             if (!LevelRush.IsLevelRush())
             {
                 lasttry = false;
+                timerfinished = false;
                 var rand = new System.Random();
                 int randomlevel = rand.Next(levels.Length);
-                string nextlevel = levels[randomlevel];
-                //Check for if the level is the same?
-                Singleton<Game>.Instance.PlayLevel(nextlevel, true);
 
+                string nextlevel = levels[randomlevel];
+                if (Game.GetCurrentLevel().levelID == nextlevel)
+                {
+                    NewLevel();
+                }
+                else
+                {
+                    Singleton<Game>.Instance.PlayLevel(nextlevel, true);
+                    if (devmode)
+                    {
+                        MelonLogger.Msg("New Level Loaded");
+                    }
+                }
             }
         }
         public static void CheckforNewLevel()
         {
             //Called everytime a level is restarted
             //Enables Last Try
-            if (timerfinished && Setting_NeonRandom_Enabled.Value && lasttry == false)
+            if (timerfinished && Setting_NeonRandom_Enabled.Value && Setting_NeonRandom_TimerEnabled.Value && lasttry == false)
             {
                 lasttry = true;
+                if (devmode)
+                {
+                    MelonLogger.Msg("Last Try Started");
+                }
             }
             //last try has concluded
-            else if (timerfinished && Setting_NeonRandom_Enabled.Value)
+            else if (timerfinished && Setting_NeonRandom_Enabled.Value && Setting_NeonRandom_TimerEnabled.Value && lasttry)
             {
                 timerfinished = false;
+                lasttry = false;
+                timerrunning = false;
                 NewLevel();
+                if (devmode)
+                {
+                    MelonLogger.Msg("Last Try Completed");
+                }
+            }
+            if (!Setting_NeonRandom_TimerEnabled.Value || !Setting_NeonRandom_Enabled.Value)
+            {
+                lasttry = false;
+                if (devmode)
+                {
+                    MelonLogger.Msg("Last Try set to false because Setting change");
+                }
+
             }
         }
     }
