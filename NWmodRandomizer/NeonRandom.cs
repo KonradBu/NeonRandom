@@ -24,6 +24,7 @@ namespace NeonRandom
         public static MelonPreferences_Entry<bool> Setting_NeonRandom_WarningEnabled;
         public static MelonPreferences_Entry<KeyCode> Setting_NeonRandom_NewLevel;
         public static MelonPreferences_Entry<bool> Setting_NeonRandom_TimerEnabled;
+        public static MelonPreferences_Entry<bool> Setting_NeonRandom_BuggyMode;
         #endregion
 
         // All the Levels as IDs
@@ -35,6 +36,7 @@ namespace NeonRandom
         public static bool lasttry = false;
         private static bool devmode = false;
         public static bool timerrunning = false;
+        public static bool levelstackpreventer = false;
 
         [Obsolete]
         public override void OnApplicationStart()
@@ -46,6 +48,7 @@ namespace NeonRandom
             Setting_NeonRandom_Time = Config_NeonRandom.CreateEntry("Time to load new level", 300, description: "Time in seconds, after which the mod will load a new random level");
             Setting_NeonRandom_TimerEnabled = Config_NeonRandom.CreateEntry("Enable Timer", true, description: "Enables the times, loading you into a new level after the timer finished");
             Setting_NeonRandom_WarningEnabled = Config_NeonRandom.CreateEntry("Warning Enabled", true, description: "During your last try a warning will be shown that after this try the level will change to a new one. Press the manual random level key during the last try to prevent it from loading a new level and instead restart the timer.");
+            Setting_NeonRandom_BuggyMode= Config_NeonRandom.CreateEntry("Enable Buggy mode", false, description: "This enables beeing able to stack multiple levels on top of each other, causes some really wierd shit but looks cool, so do with this as you like, just use anticheat pls");
         }
 
         
@@ -91,6 +94,7 @@ namespace NeonRandom
   
         private void OnLevelLoadComplete()
         {
+            levelstackpreventer = false;
             string currentLevel = "";
             //Start timer when a level first loads
             if (Setting_NeonRandom_Enabled.Value && Setting_NeonRandom_TimerEnabled.Value && !timerrunning)
@@ -131,25 +135,29 @@ namespace NeonRandom
 
         private static void NewLevel()
         {
-            //Loading the new level
-            if (!LevelRush.IsLevelRush())
+            if(levelstackpreventer == false || Setting_NeonRandom_BuggyMode.Value)
             {
-                lasttry = false;
-                timerfinished = false;
-                var rand = new System.Random();
-                int randomlevel = rand.Next(levels.Length);
+                levelstackpreventer = true;
+                //Loading the new level
+                if (!LevelRush.IsLevelRush())
+                {
+                    lasttry = false;
+                    timerfinished = false;
+                    var rand = new System.Random();
+                    int randomlevel = rand.Next(levels.Length);
 
-                string nextlevel = levels[randomlevel];
-                if (Game.GetCurrentLevel().levelID == nextlevel)
-                {
-                    NewLevel();
-                }
-                else
-                {
-                    Singleton<Game>.Instance.PlayLevel(nextlevel, true);
-                    if (devmode)
+                    string nextlevel = levels[randomlevel];
+                    if (Game.GetCurrentLevel().levelID == nextlevel)
                     {
-                        MelonLogger.Msg("New Level Loaded");
+                        NewLevel();
+                    }
+                    else
+                    {
+                        Singleton<Game>.Instance.PlayLevel(nextlevel, true);
+                        if (devmode)
+                        {
+                            MelonLogger.Msg("New Level Loaded");
+                        }
                     }
                 }
             }
